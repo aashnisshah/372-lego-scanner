@@ -1,3 +1,6 @@
+// A primitive, 'trying out' implementation of the audio scanner which just
+// checked for certain functionality required for the full working
+
 #include "stdio.h"
 
 int main(){

@@ -1,3 +1,6 @@
+// Ignore this file, it's not the main implementation of the audio scanner
+// Neither is it used
+
 .equ ADDR_AUDIODACFIFO, 0x10003040
 main:
   movia r2,ADDR_AUDIODACFIFO

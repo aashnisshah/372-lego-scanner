@@ -1,17 +1,22 @@
+// This is the primary (and the only one, for now) file that 
+// contains all the code for the audio scanner
 
+// This module is included for testing purposes.
+// It's not used for the main functionality
 #include "stdio.h"
 
-volatile int regSenseVal;
-int soundFlag;
+// audio_ptr is used to point to the device to which
+// the read value would be written to eventually
 volatile int * audio_ptr;
+// audibuf is used to store the actual values which
+// would be written to the device
 long audiobuf;
-int fifospace, leftdata, rightdata;
-int buffer_index;
-int counter;
+// fifospace is the register that directs where to 
+// write the values to.
+// counter just determines what value is written when
+int fifospace, counter;
 
 void run_motor(){
-	// printf("inside run_motor\n");
-
 	asm(".equ ADDR_JP2, 0x10000070");
 	asm("movia r8, ADDR_JP2");
 
@@ -23,8 +28,6 @@ void run_motor(){
 }
 
 void sensor(){
-	
-
 	asm(".equ ADDR_JP2, 0x10000070");
 	asm("movia r8, ADDR_JP2");
 
@@ -32,22 +35,15 @@ void sensor(){
 	asm("stwio r10, 4(r8)");
 
 	asm("loop:");
-		//printf("inside sensor\n");
 		asm("movia r11, 0xfffeffff");
 		asm("stwio r11, 0(r8)");
 		asm("ldwio r5, 0(r8)");
 		asm("srli r5, r5,17");
 		asm("andi r5, r5,0x1");
-		// asm volatile("ldw r5, %0" : : "m" (regSenseVal));
-		// printf("Reg val 5: %d\n", regSenseVal);
 		asm("bne r0, r5,loop");
 	asm("good:");
-		//printf("inside good\n");
 		asm("ldwio r10, 0(r8)");
 		asm("srli r10, r10, 27");
-		// our code
-		// asm volatile("ldw r10, %0" : : "m" (regSenseVal));
-		// printf("Reg val 10: %d\n", regSenseVal);
 		asm("andi r10, r10, 0x0f");
 
 		asm("movia r6, 0x5");
@@ -66,22 +62,15 @@ void sensor2(){
 	asm("stwio r9, 4(r7)");
 
 	asm("loop2:");
-		//printf("inside sensor\n");
 		asm("movia r12, 0xfffbffff");
 		asm("stwio r12, 0(r7)");
 		asm("ldwio r13, 0(r7)");
 		asm("srli r13, r13,19");
 		asm("andi r13, r13,0x1");
-		// asm volatile("ldw r5, %0" : : "m" (regSenseVal));
-		// printf("Reg val 5: %d\n", regSenseVal);
 		asm("bne r0, r13,loop2");
 	asm("good2:");
-		//printf("inside good\n");
 		asm("ldwio r9, 0(r7)");
 		asm("srli r9, r9, 27");
-		// our code
-		// asm volatile("ldw r10, %0" : : "m" (regSenseVal));
-		// printf("Reg val 10: %d\n", regSenseVal);
 		asm("andi r9, r9, 0x0f");
 		// r6 is not changed as we're using the same values for
 		// both the sensors
@@ -143,19 +132,16 @@ void playnote2(){
 
 int main(){
 	audio_ptr = (int *) 0x10003040;
-	buffer_index = 0;
 	counter = 0;
 
 	while(1){
-		run_motor();
-		sensor();
-		/* first test if the 2nd sensor is working properly
+		/* 	Recommendation:
+		 *  First test if the 2nd sensor is working properly
 		 *  and then try running em both
 		 */
+		run_motor();
+		sensor();
 		sensor2();
-		// playnote();
-		// playnote2();
 	}
-
 	return 0;
 }

@@ -1,3 +1,6 @@
+// This fie can be ignored too. It's here for reference purposes but is
+// not used directly
+
 .include "nios_macros.s"
 .equ GPIO_JP1,	 0x10000060         /*GPIO_JP1*/
 .equ GPIO_JP2,	 0x10000070         /*GPIO_JP2*/
